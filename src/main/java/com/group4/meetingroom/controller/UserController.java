@@ -27,11 +27,15 @@ public class UserController {
     public MessageModel userRegister(@RequestBody User user){
         return userService.userRegister(user);
     }
-    @DeleteMapping("/delete")
+    //删除用户
+    @DeleteMapping("/deleteUser")
     @ResponseBody
     public MessageModel userDelete(@RequestParam int id){
         return userService.userDelete(id);
     }
+    //展示用户信息
+
+    public
     @Autowired
     UserService userService;
 }

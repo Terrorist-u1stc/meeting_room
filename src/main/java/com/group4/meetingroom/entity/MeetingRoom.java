@@ -1,11 +1,15 @@
 package com.group4.meetingroom.entity;
 
+import java.util.List;
+
 public class MeetingRoom {
     private int id;
     private String roomName;
     private int capacity;
     private int status;
     private String equipment;
+    private String location;
+    private List<RoomReservation> reservations;
 
     public int getId() {
         return id;
@@ -45,5 +49,21 @@ public class MeetingRoom {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public List<RoomReservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<RoomReservation> reservations) {
+        this.reservations = reservations;
     }
 }

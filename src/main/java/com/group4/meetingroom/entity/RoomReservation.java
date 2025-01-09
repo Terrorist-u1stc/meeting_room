@@ -6,6 +6,8 @@ public class RoomReservation {
     private Integer rReservationId;
     private Integer userId;
     private Integer roomId;
+    private String roomName;
+    private String userName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     public Integer getrReservationId() {
@@ -46,5 +48,19 @@ public class RoomReservation {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 }
