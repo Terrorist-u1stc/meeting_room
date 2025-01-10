@@ -49,7 +49,7 @@ public interface RoomMapper {
                   equipment,
                   location
            from meeting_room
-           where room_id = #{roomName}
+           where room_name = #{roomName}
            """)
     @Results({
             @Result(property = "id", column = "room_id"),

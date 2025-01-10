@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class UserController {
     //用户登录
+    @CrossOrigin(origins = "*")
     @PostMapping("/login")
     @ResponseBody
     public MessageModel<User> userLogin(@RequestParam String userName, @RequestParam String passWord, HttpSession session){
