@@ -1,5 +1,6 @@
 package com.group4.meetingroom.service;
 
+import com.group4.meetingroom.entity.Booking;
 import com.group4.meetingroom.entity.MeetingRoom;
 import com.group4.meetingroom.entity.RoomReservation;
 import com.group4.meetingroom.entity.User;
@@ -28,15 +29,25 @@ public class RoomReservationService {
     MessageModel<RoomReservation> result = new MessageModel<>();
     return result;
 }
-    public Map<String, Object> reserveRoom(RoomReservation roomReservation) {
+    public Map<String, Object> reserveRoom(Booking booking) {
+
+        RoomReservation roomReservation = new RoomReservation();
+        roomReservation.setUserName(booking.getUserName());
+        roomReservation.setUserId(booking.getUserId());
+        roomReservation.setEndTime(booking.getEndTime());
+        roomReservation.setStartTime(booking.getStartTime());
+        roomReservation.setRoomName(booking.getRoomName());
+
         Map<String, Object> response = new HashMap<>();
         //本来是直接通过ID来查询，由于前端发来的是会议室名，先通过会议室名查id，再通过id来查询
         String roomName = roomReservation.getRoomName();
         MeetingRoom room;
         Integer roomId;
+        System.out.println(roomReservation.getUserName());
         if(roomName != null && !roomName.trim().isEmpty())
         { room = roomMapper.selectByName(roomName);
-         roomId = room.getId();}
+         roomId = room.getId();
+         roomReservation.setRoomId(roomId);}
         else {
              roomId = roomReservation.getRoomId();
              room = roomMapper.selectById(roomId);
@@ -80,7 +91,9 @@ public class RoomReservationService {
             meetingRoom.put("capacity", room.getCapacity());
             meetingRoom.put("availableTime", "9:00 - 18:00");
             meetingRoom.put("reservedBy", user.getUserName());
+            meetingRoom.put("participants" ,4);
             response.put("meetingrooms",meetingRoom);
+            System.out.println("Response: " + response);
             return response;
         }catch (PersistenceException e){
             response.put("success", false);
@@ -97,6 +110,10 @@ public class RoomReservationService {
         }else
         {reservations = roomReservationMapper.findByUserIdAndDate(userId, date);}
         if (reservations != null && !reservations.isEmpty()) {
+            for(RoomReservation reservation: reservations){
+                //统计参会人数
+                reservation.setParticipants(roomReservationMapper.countAttendees(reservation.getrReservationId()));
+            }
             // 如果有预定，返回成功状态
             return new MessageModel<>(1, "成功", reservations);
         } else {

@@ -1,5 +1,6 @@
 package com.group4.meetingroom.controller;
 
+import com.group4.meetingroom.entity.Booking;
 import com.group4.meetingroom.entity.RoomReservation;
 import com.group4.meetingroom.entity.User;
 import com.group4.meetingroom.entity.vo.MessageModel;
@@ -22,7 +23,7 @@ public class RservationController {
     @CrossOrigin(origins = "*")
     @PostMapping("/api/meeting-rooms/availability")
     public Map<String, Object> reserveRoom(
-            @RequestBody RoomReservation roomReservation,
+            @RequestBody Booking booking,
             HttpSession session) {
         User user = (User) session.getAttribute("currentUser");
         if (user == null){
@@ -31,8 +32,9 @@ public class RservationController {
             response.put("message", "用户未登录");
             response.put("meetingRooms", null);
             return response;}
-        roomReservation.setUserId(user.getId());
-        return reservationService.reserveRoom(roomReservation);
+        booking.setUserId(user.getId());
+        booking.setUserName(user.getUserName());
+        return reservationService.reserveRoom(booking);
     }
     //查询预约记录
     @CrossOrigin(origins = "*")
