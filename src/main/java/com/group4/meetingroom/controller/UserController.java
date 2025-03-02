@@ -34,7 +34,13 @@ public class UserController {
     public MessageModel userDelete(@RequestParam int id){
         return userService.userDelete(id);
     }
+    @CrossOrigin(origins = "*")
+    @GetMapping("/test")
+    @ResponseBody
     //展示用户信息
+    public String getUserInfo(@RequestParam(required = false) String name) {
+        return name != null ? "Hello, " + name : "Hello, Guest";
+    }
 
     public
     @Autowired
