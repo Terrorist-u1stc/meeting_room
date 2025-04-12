@@ -7,24 +7,30 @@ import com.group4.meetingroom.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 public class IntegratedDesignProjectApplicationTests {
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // 确保与 SecurityConfig 中的 Bean 一致
+
 	@Autowired
-	UserMapper userMapper;
-	@Autowired
-	UserService userService;
+	private UserMapper userMapper;
+
 	@Test
-	void contextLoads() {
-		User user = new User();
-		user.setPassWord("1234567");
-		user.setUserName("tom");
-		user.setPhoneNumber("123456789");
-		user.setId(1);
-		userMapper.delete(4);
-		//userMapper.insertUser(user);
-		//MessageModel messageModel = userService.userLogin(user.getUserName(), user.getPassWord());
-		//System.out.println(messageModel.getMsg());
+	public void testPasswordMatch() {
+		String rawPassword = "123456"; // 用户输入的原始密码
+		String username = "admin";   // 测试用户名
+
+		// --- 步骤 1: 模拟注册流程 ---
+		// 假设你的注册方法需要手动调用，此处直接操作数据库
+
+
+		// --- 步骤 2: 查询数据库中的加密密码 ---
+		User dbUser = userMapper.selectByName(username);
+		// ✅ 使用 matches() 方法验证
+		boolean isMatch = passwordEncoder.matches(rawPassword, dbUser.getPassword());
+		System.out.println("密码是否匹配: " + isMatch); // 应输出 true
 	}
 
 }

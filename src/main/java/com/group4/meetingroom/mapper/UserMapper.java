@@ -7,14 +7,14 @@ import org.apache.ibatis.annotations.*;
 public interface UserMapper {
     //注册用户
     @Insert("""
-            insert into m_room_user(username,pwd,phone,user_id,role)
-            values(#{userName}, #{passWord}, #{phoneNumber}, user_id_seq.NEXTVAL,0)
+            insert into m_room_user(username,pwd,phone,email,role)
+            values(#{userName}, #{password}, #{phoneNumber},#{email},'ROLE_USER')
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "user_id")
     @Results({
             @Result(property = "id", column = "user_id"),
             @Result(property = "userName", column = "username"),
-            @Result(property = "passWord", column = "pwd"),
+            @Result(property = "password", column = "pwd"),
             @Result(property = "phoneNumber", column = "phone"),
     })
     void insertUser(User user);
@@ -35,7 +35,7 @@ public interface UserMapper {
     @Results({
             @Result(property = "id", column = "user_id"),
             @Result(property = "userName", column = "username"),
-            @Result(property = "passWord", column = "pwd"),
+            @Result(property = "password", column = "pwd"),
             @Result(property = "phoneNumber", column = "phone")
     })
     User selectById(int id);
@@ -45,6 +45,7 @@ public interface UserMapper {
                   username,
                   phone,
                   pwd,
+                  email,
                   role
            from m_room_user
            where username = #{userName}
@@ -52,7 +53,7 @@ public interface UserMapper {
     @Results({
             @Result(property = "id", column = "user_id"),
             @Result(property = "userName", column = "username"),
-            @Result(property = "passWord", column = "pwd"),
+            @Result(property = "password", column = "pwd"),
             @Result(property = "phoneNumber", column = "phone")
     })
     User selectByName(String userName);

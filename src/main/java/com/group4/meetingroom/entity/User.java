@@ -1,11 +1,12 @@
 package com.group4.meetingroom.entity;
 
-public class User {
+public class User  {
     private int id;
     private String userName;
-    private String passWord;
+    private String password;
     private String phoneNumber;
-    private Boolean role;
+    private String email;
+    private String role;
 
     public int getId() {
         return id;
@@ -23,12 +24,13 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhoneNumber() {
@@ -39,12 +41,21 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Boolean getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Boolean role) {
+    public void setRole(String role) {
         this.role = role;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 }
 

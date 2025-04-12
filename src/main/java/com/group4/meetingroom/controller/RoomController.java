@@ -5,6 +5,7 @@ import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,10 +13,12 @@ import java.util.List;
 @RestController
 
 public class RoomController {
+
     @Autowired
     RoomService roomService;
     //添加会议室或更新会议室，前端传递的是roomid，如果更新信息时，能把id也传来就好了。
     @PostMapping("/meetingRooms")
+    @PreAuthorize("hasRole('ADMIN')")
     public MessageModel<MeetingRoom> addRoom(@RequestBody MeetingRoom room, @RequestParam String action) {
         MessageModel<MeetingRoom> m = new MessageModel<>();
         if (action.equals("add")){
@@ -32,4 +35,5 @@ public class RoomController {
     public MessageModel<List<MeetingRoom>> getAll(){
         return roomService.getAll();
     }
+    //推荐会议室
 }
