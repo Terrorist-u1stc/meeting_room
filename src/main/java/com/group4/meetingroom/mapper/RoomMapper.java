@@ -11,8 +11,8 @@ import java.util.List;
 public interface RoomMapper {
     //新增会议室
     @Insert("""
-            insert into meeting_room(room_name,capacity,room_id,status,equipment,location)
-            values(#{roomName}, #{capacity}, room_id_seq.NEXTVAL,1,#{equipment},#{location})
+            insert into meeting_room(room_name,capacity,status,equipment,location)
+            values(#{roomName}, #{capacity},1,#{equipment},#{location})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "room_id")
     @Results({
@@ -59,7 +59,7 @@ public interface RoomMapper {
     })
     MeetingRoom selectByName(String roomName);
     @Select("""
-            select * from meeting_room   
+            select * from meeting_room
             """)
     @Results({
             @Result(property = "id", column = "room_id"),

@@ -25,7 +25,7 @@ public class RservationController {
     public Map<String, Object> reserveRoom(
             @RequestBody Booking booking,
             HttpSession session) {
-        User user = (User) session.getAttribute("currentUser");
+        User user = (User) session.getAttribute("user");
         if (user == null){
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
@@ -43,7 +43,7 @@ public class RservationController {
             @RequestParam(required = false) String date,
             HttpSession session
     ){
-        User user = (User) session.getAttribute("currentUser");
+        User user = (User) session.getAttribute("user");
         if (user == null){
             MessageModel<List<RoomReservation>> response = new MessageModel<>();
             response.setMsg("用户未登录");

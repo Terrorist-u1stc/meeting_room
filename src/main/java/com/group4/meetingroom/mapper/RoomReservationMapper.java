@@ -15,8 +15,8 @@ public interface RoomReservationMapper {
     List<RoomReservation> findReservationTimesByRoomId(Integer roomId);
 
     @Insert("""
-            INSERT INTO room_reservation (r_reservation_id, user_id, room_id, start_time, end_time,user_name) 
-            VALUES (room_reserv_id_seq.NEXTVAL, #{userId}, #{roomId}, #{startTime}, #{endTime}, #{userName})
+            INSERT INTO room_reservation ( user_id, room_id, start_time, end_time,user_name) 
+            VALUES ( #{userId}, #{roomId}, #{startTime}, #{endTime}, #{userName})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "rReservationId", keyColumn = "r_reservation_id")
     @Results({
