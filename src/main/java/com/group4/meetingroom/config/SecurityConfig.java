@@ -1,6 +1,7 @@
 package com.group4.meetingroom.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group4.meetingroom.entity.CustomUserDetails;
 import com.group4.meetingroom.entity.User;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.MyUserDetailService;
@@ -16,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -33,12 +37,27 @@ public class SecurityConfig{
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOriginPattern("*"); // 允许所有 origin（支持通配符）
+        config.addAllowedMethod("*");        // 允许所有 HTTP 方法
+        config.addAllowedHeader("*");        // 允许所有请求头
+        config.setAllowCredentials(true);    // 允许携带 cookie（比如登录 token）
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // 应用于所有路径
+        return source;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+
                 .userDetailsService(myUserDetailService)
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register").permitAll()
                         .anyRequest().authenticated()
@@ -48,8 +67,8 @@ public class SecurityConfig{
                         .successHandler((request, response, authentication) -> {
                             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                            User user = (User) authentication.getPrincipal();
-                            request.getSession().setAttribute("user", user);
+                            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+                            User user = customUserDetails.getUser();
 
                             MessageModel<User> message = new MessageModel<>(200, "登录成功", user);
                             response.setStatus(200);

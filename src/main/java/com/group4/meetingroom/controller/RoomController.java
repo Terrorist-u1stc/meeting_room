@@ -17,6 +17,7 @@ public class RoomController {
     @Autowired
     RoomService roomService;
     //添加会议室或更新会议室，前端传递的是roomid，如果更新信息时，能把id也传来就好了。
+    @CrossOrigin(origins = "*")
     @PostMapping("/meetingRooms")
     @PreAuthorize("hasRole('ADMIN')")
     public MessageModel<MeetingRoom> addRoom(@RequestBody MeetingRoom room, @RequestParam String action) {

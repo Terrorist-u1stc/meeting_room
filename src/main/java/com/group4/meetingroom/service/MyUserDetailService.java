@@ -1,5 +1,6 @@
 package com.group4.meetingroom.service;
 
+import com.group4.meetingroom.entity.CustomUserDetails;
 import com.group4.meetingroom.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -20,11 +21,11 @@ public class MyUserDetailService implements UserDetailsService {
         if(user == null){
             throw new UsernameNotFoundException("用户不存在");
         }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUserName(),
-                user.getPassword(),
-                AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole())
-        );
-
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getUserName(),
+//                user.getPassword(),
+//                AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole())
+//        );
+        return new CustomUserDetails(user);
     }
 }
