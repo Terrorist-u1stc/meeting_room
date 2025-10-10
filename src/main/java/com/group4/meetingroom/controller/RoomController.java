@@ -1,6 +1,7 @@
 package com.group4.meetingroom.controller;
 
 import com.group4.meetingroom.entity.MeetingRoom;
+import com.group4.meetingroom.entity.RoomStatistics;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,23 @@ public class RoomController {
         return m;
     }
     //查询会议室
+    @CrossOrigin(origins = "*")
     @GetMapping("/room/{id}")
     public MessageModel<MeetingRoom> getRoomById(@PathVariable Integer id) {return roomService.selectRoom(id);}
+
+    @CrossOrigin(origins = "*")
     @GetMapping("/getMeetingRooms")
     public MessageModel<List<MeetingRoom>> getAll(){
         return roomService.getAll();
     }
     //推荐会议室
+    //会议室统计信息
+    @CrossOrigin(origins = "*")
+    @GetMapping("/getStatics")
+    public MessageModel<List<RoomStatistics>> getStats(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        return roomService.getStats(startDate, endDate);
+    }
+
 }

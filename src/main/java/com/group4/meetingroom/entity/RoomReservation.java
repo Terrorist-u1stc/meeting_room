@@ -10,7 +10,7 @@ public class RoomReservation {
     private String userName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private int participants = 0;
+    private int attendees = 0;
     public Integer getrReservationId() {
         return rReservationId;
     }
@@ -65,11 +65,11 @@ public class RoomReservation {
         this.roomName = roomName;
     }
 
-    public int getParticipants() {
-        return participants;
+    public int getAttendees() {
+        return attendees;
     }
 
-    public void setParticipants(int participants) {
-        this.participants = participants;
+    public void setAttendees(int attendees) {
+        this.attendees = attendees;
     }
 }

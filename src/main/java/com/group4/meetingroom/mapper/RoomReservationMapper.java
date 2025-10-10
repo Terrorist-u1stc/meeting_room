@@ -15,22 +15,22 @@ public interface RoomReservationMapper {
     List<RoomReservation> findReservationTimesByRoomId(Integer roomId);
 
     @Insert("""
-            INSERT INTO room_reservation ( user_id, room_id, start_time, end_time,user_name) 
-            VALUES ( #{userId}, #{roomId}, #{startTime}, #{endTime}, #{userName})
+            INSERT INTO room_reservation ( user_id, room_id, start_time, end_time,user_name,attendees)
+            VALUES ( #{userId}, #{roomId}, #{startTime}, #{endTime},#{userName},#{attendees})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "rReservationId", keyColumn = "r_reservation_id")
     @Results({
             @Result(property = "rReservationId", column = "r_reservation_id"),
             @Result(property = "userId", column = "user_id"),
             @Result(property = "roomId", column = "room_id"),
-            @Result(property = "userName", column = "user_name"),
             @Result(property = "startTime", column = "start_time"),
+            @Result(property = "userName", column = "user_name"),
             @Result(property = "endTime", column = "end_time")
     })
     void insertReservation(RoomReservation roomReservation);
     //查询预约记录，无时间要求，表里没有room_name的字段，记得改一下
     @Select("""
-            SELECT r.start_time, r.end_time, r.user_id, r.user_name, r.room_id, mr.room_name
+            SELECT r.start_time, r.end_time, r.user_id, r.user_name, r.room_id, mr.room_name,r_reservation_id,attendees
             FROM room_reservation r
             JOIN meeting_room mr ON r.room_id = mr.room_id
             WHERE r.user_id = #{userId}
@@ -73,9 +73,16 @@ public interface RoomReservationMapper {
     })
     List<RoomReservation> selectAll(Integer roomId);
     @Select("""
-            SELECT count(user_rsrv_id)
-            from user_rsrv
+            SELECT count(user_id)
+            from reservation_participant
             where r_reservation_id = #{rReservationId}
             """)
     int countAttendees(Integer rReservationId);
+    @Delete("""
+            delete from
+            room_reservation
+            where
+            r_reservation_id = #{rReservationId}
+            """)
+    int cancel(int rReservationId);
 }

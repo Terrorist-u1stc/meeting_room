@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,43 +30,31 @@ public class RoomReservationService {
     MessageModel<RoomReservation> result = new MessageModel<>();
     return result;
 }
-    public Map<String, Object> reserveRoom(Booking booking) {
-
+    public MessageModel<Void> reserveRoom(LocalDateTime startTime,LocalDateTime endTime,int roomId,
+                                          int attendees, int userId) {
+        MessageModel<Void> response = new MessageModel<>();
+       User user = userMapper.selectById(userId);
         RoomReservation roomReservation = new RoomReservation();
-        roomReservation.setUserName(booking.getUserName());
-        roomReservation.setUserId(booking.getUserId());
-        roomReservation.setEndTime(booking.getEndTime());
-        roomReservation.setStartTime(booking.getStartTime());
-        roomReservation.setRoomName(booking.getRoomName());
+        roomReservation.setStartTime(startTime);
+        roomReservation.setEndTime(endTime);
+        roomReservation.setUserId(userId);
+        roomReservation.setRoomId(roomId);
+        roomReservation.setUserName(user.getUserName());
+        roomReservation.setAttendees(attendees);
 
-        Map<String, Object> response = new HashMap<>();
-        //本来是直接通过ID来查询，由于前端发来的是会议室名，先通过会议室名查id，再通过id来查询
-        String roomName = roomReservation.getRoomName();
         MeetingRoom room;
-        Integer roomId;
-        System.out.println(roomReservation.getUserName());
-        if(roomName != null && !roomName.trim().isEmpty())
-        { room = roomMapper.selectByName(roomName);
-         roomId = room.getId();
-         roomReservation.setRoomId(roomId);}
-        else {
-             roomId = roomReservation.getRoomId();
-             room = roomMapper.selectById(roomId);
-        }
-        User user = userMapper.selectById(roomReservation.getUserId());
+        room = roomMapper.selectById(roomId);
 
         if (room == null) {
-            response.put("success", false);
-            response.put("message", "该会议室不存在");
-            response.put("meetingRooms", null);
+            response.setMsg("该会议室不存在");
+            response.setStatus(404);
             return response;
         }
 
         // 检查会议室状态是否可用
         if (room.getStatus() != 1) {
-            response.put("success", false);
-            response.put("message", "该会议室目前不可用");
-            response.put("meetingRooms", null);
+            response.setMsg("该会议室目前不可用");
+            response.setStatus(400);
             return response;
         }
 
@@ -74,31 +63,22 @@ public class RoomReservationService {
         for (RoomReservation existingReservation : reservations) {
             if (roomReservation.getStartTime().isBefore(existingReservation.getEndTime()) &&
                     roomReservation.getEndTime().isAfter(existingReservation.getStartTime())) {
-                response.put("success", false);
-                response.put("message", "预约时间存在冲突");
-                response.put("meetingRooms", null);
+                response.setMsg("该会议室该时间段已被占用");
+                response.setStatus(409);
                 return response;
             }
         }
         try{
             // 插入预约记录
             roomReservationMapper.insertReservation(roomReservation);
-            response.put("success", true);
-            response.put("message", "已成功预约");
-            Map<String, Object> meetingRoom = new HashMap<>();
-            meetingRoom.put("roomName", room.getRoomName());
-            meetingRoom.put("location", room.getLocation());
-            meetingRoom.put("capacity", room.getCapacity());
-            meetingRoom.put("availableTime", "9:00 - 18:00");
-            meetingRoom.put("reservedBy", user.getUserName());
-            meetingRoom.put("participants" ,4);
-            response.put("meetingrooms",meetingRoom);
-            System.out.println("Response: " + response);
+            response.setStatus(200);
+            response.setMsg("预约成功");
             return response;
         }catch (PersistenceException e){
-            response.put("success", false);
-            response.put("message", "预约失败");
-            response.put("meetingRooms", null);
+
+            e.printStackTrace();
+            response.setStatus(500);
+            response.setMsg("预约失败，请稍后重试或检查预约信息");
             return response;
         }
     }
@@ -110,15 +90,30 @@ public class RoomReservationService {
         }else
         {reservations = roomReservationMapper.findByUserIdAndDate(userId, date);}
         if (reservations != null && !reservations.isEmpty()) {
-            for(RoomReservation reservation: reservations){
-                //统计参会人数
-                reservation.setParticipants(roomReservationMapper.countAttendees(reservation.getrReservationId()));
-            }
+//            for(RoomReservation reservation: reservations){
+//                //统计参会人数
+//                reservation.setParticipants(roomReservationMapper.countAttendees(reservation.getrReservationId()));
+//            }
             // 如果有预定，返回成功状态
             return new MessageModel<>(1, "成功", reservations);
         } else {
             // 如果没有预定，返回失败状态
             return new MessageModel<>(0, "没有找到预定记录", null);
         }
+    }
+
+    public MessageModel<Void> cancel(int id){
+        MessageModel<Void> response= new MessageModel<>();
+
+        int result = roomReservationMapper.cancel(id);
+        if (result > 0) {
+            response.setMsg("取消预约成功");
+            response.setStatus(200);
+        } else {
+            response.setStatus(500); // 失败
+            response.setMsg("取消预约失败");
+        }
+
+        return response;
     }
 }

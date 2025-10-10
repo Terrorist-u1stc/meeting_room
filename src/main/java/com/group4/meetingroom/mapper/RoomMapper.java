@@ -1,6 +1,7 @@
 package com.group4.meetingroom.mapper;
 import com.group4.meetingroom.entity.Booking;
 import com.group4.meetingroom.entity.MeetingRoom;
+import com.group4.meetingroom.entity.RoomStatistics;
 import com.group4.meetingroom.entity.User;
 import org.apache.ibatis.annotations.*;
 
@@ -79,4 +80,15 @@ public interface RoomMapper {
         WHERE room_id = #{id}
         """)
     void updateRoom(MeetingRoom room);
+
+    @Select("CALL get_room_stats(#{startDate}, #{endDate})")
+    @Results({
+            @Result(property = "roomId", column = "room_id"),
+            @Result(property = "usageCount", column = "usage_count"),
+            @Result(property = "totalDuration", column = "total_duration"),
+            @Result(property = "totalAttendees", column = "total_attendees"),
+            @Result(property = "avgAttendees", column = "avg_attendees")
+    })
+    List<RoomStatistics> getRoomStats(@Param("startDate") String startDate,
+                                      @Param("endDate") String endDate);
 }

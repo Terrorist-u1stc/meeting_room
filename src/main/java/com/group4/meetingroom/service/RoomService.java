@@ -2,6 +2,7 @@ package com.group4.meetingroom.service;
 
 import com.group4.meetingroom.entity.MeetingRoom;
 import com.group4.meetingroom.entity.RoomReservation;
+import com.group4.meetingroom.entity.RoomStatistics;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.mapper.RoomMapper;
 import com.group4.meetingroom.mapper.RoomReservationMapper;
@@ -82,5 +83,13 @@ public class RoomService {
             m.setData(room);
             return m;
         }
+    }
+
+    public MessageModel<List<RoomStatistics>> getStats(String start, String end) {
+        MessageModel<List<RoomStatistics>> message = new MessageModel<>();
+        message.setData( roomMapper.getRoomStats(start, end));
+        message.setStatus(HttpStatus.OK.value());
+        message.setMsg("查询成功");
+        return message;
     }
 }
