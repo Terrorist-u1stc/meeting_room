@@ -1,16 +1,19 @@
 package com.group4.meetingroom.controller;
+import com.group4.meetingroom.entity.CustomUserDetails;
 import com.group4.meetingroom.entity.User;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.UserService;
 import com.group4.meetingroom.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 public class UserController {
 //    //用户登录
 @PostMapping("/login")
@@ -24,7 +27,7 @@ public MessageModel<Map<String, Object>> userLogin(
 
     if (result.getStatus() == HttpStatus.OK.value()) {
         User user = result.getData();
-        String token = JwtUtils.generateToken(user.getId());
+        String token = JwtUtils.generateToken(user.getId(), user.getTokenVersion());
 
         Map<String, Object> data = new HashMap<>();
         data.put("user", user);
@@ -52,13 +55,33 @@ public MessageModel<Map<String, Object>> userLogin(
     public MessageModel userDelete(@RequestParam int id){
         return userService.userDelete(id);
     }
+
     @CrossOrigin(origins = "*")
-    @GetMapping("/test")
+    @PostMapping("/logout")
     @ResponseBody
-    //展示用户信息
-    public String getUserInfo(@RequestParam(required = false) String name) {
-        return name != null ? "Hello, " + name : "Hello, Guest";
+    public MessageModel<Void> logout(){
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Logout Authentication = " + auth);
+        if (auth == null) {
+            MessageModel<Void> r= new MessageModel<>();
+            r.setStatus(402);
+            r.setMsg("wrong");
+            return r;
+        }
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        return userService.logout(user.getId());
     }
+    @CrossOrigin(origins = "*")
+    @PostMapping("/test")
+    @ResponseBody
+    public Map<String, Object> test(Authentication auth) {
+        System.out.println("Authentication = " + auth);
+        return Map.of(
+                "userId", auth != null ? auth.getName() : null,
+                "authorities", auth != null ? auth.getAuthorities() : null
+        );
+    }
+
     public
     @Autowired
     UserService userService;

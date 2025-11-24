@@ -91,4 +91,22 @@ public class UserService {
         }
         return messageModel1;
     }
+    public MessageModel<Void> logout(Integer userId) {
+        MessageModel<Void> result = new MessageModel<>();
+        try {
+            int rows = userMapper.updateTokenVersion(userId);
+            if (rows > 0) {
+                result.setStatus(200);
+                result.setMsg("登出成功");
+            } else {
+                result.setStatus(500);
+                result.setMsg("登出失败");
+            }
+        } catch (Exception e) {
+            result.setStatus(500);
+            result.setMsg("登出异常：" + e.getMessage());
+        }
+        return result;
+    }
+
 }

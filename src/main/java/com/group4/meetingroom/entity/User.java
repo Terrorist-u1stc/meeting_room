@@ -7,7 +7,7 @@ public class User  {
     private String phoneNumber;
     private String email;
     private String role;
-
+    private Integer tokenVersion;
     public int getId() {
         return id;
     }
@@ -57,5 +57,12 @@ public class User  {
         this.email = email;
     }
 
+    public Integer getTokenVersion() {
+        return tokenVersion;
+    }
+
+    public void setTokenVersion(Integer tokenVersion) {
+        this.tokenVersion = tokenVersion;
+    }
 }
 

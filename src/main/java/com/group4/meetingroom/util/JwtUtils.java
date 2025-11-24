@@ -2,48 +2,50 @@ package com.group4.meetingroom.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 public class JwtUtils {
     private static final long EXPIRATION = 2 * 60 * 60 * 1000; // 2小时
     private static final String SECRET = "xK94mki2Nsa8eLz!@#QpRsTuVwXyZ123456";
-    private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public static String generateToken(Integer userId) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + EXPIRATION);
-
+    // 生成带版本号的 token
+    public static String generateToken(Integer userId, Integer tokenVersion) {
         return Jwts.builder()
                 .subject(userId.toString())
-                .issuedAt(now)
-                .expiration(expiryDate)
+                .claim("tokenVersion", tokenVersion)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(KEY)
                 .compact();
     }
-    public static Integer parseToken(String token) {
+
+    // 统一解析方法，失败直接抛异常
+    public static Claims parseClaims(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith((SecretKey) KEY)
+            return Jwts.parser()
+                    .verifyWith(KEY)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-
-            return Integer.parseInt(claims.getSubject()); // 从 subject 里取出 userId
-
         } catch (ExpiredJwtException e) {
-            System.out.println("Token 已过期");
-        } catch (JwtException e) {
-            System.out.println("Token 无效或签名错误：" + e.getMessage());
+            throw new RuntimeException("登录已过期");
         } catch (Exception e) {
-            System.out.println("解析 Token 时出错：" + e.getMessage());
+            throw new RuntimeException("无效的令牌");
         }
-        return null;
+    }
+
+    // 保留老方法，兼容之前代码（可选）
+    public static Integer parseToken(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            return Integer.parseInt(claims.getSubject());
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

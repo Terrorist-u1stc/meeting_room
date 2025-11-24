@@ -1,7 +1,10 @@
 package com.group4.meetingroom.filter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group4.meetingroom.entity.CustomUserDetails;
 import com.group4.meetingroom.service.MyUserDetailService;
 import com.group4.meetingroom.util.JwtUtils;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -27,6 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("---- JWT Filter executed ----");
+
 
         String header = request.getHeader("Authorization");
 
@@ -34,23 +40,44 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             try {
-                Integer userId = JwtUtils.parseToken(token);
-                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                Claims claims = JwtUtils.parseClaims(token);
+                Integer userId = Integer.valueOf(claims.getSubject());
+                Integer tokenVersion = claims.get("tokenVersion", Integer.class);
+
+                System.out.println("Token verify success, userId = " + userId + ", tokenVersion = " + tokenVersion);
+
+
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    System.out.println("Authentication was NULL, setting a new authentication.");
 
                     CustomUserDetails userDetails = (CustomUserDetails) userDetailService.loadUserById(userId);
+
+                    // 核心：版本号校验
+                    if (!userDetails.getTokenVersion().equals(tokenVersion)) {
+                        throw new RuntimeException("登录已失效，请重新登录");
+                    }
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    System.out.println("Authentication SET SUCCESSFULLY.");
                 }
             } catch (Exception e) {
-                // token 无效或过期，可记录日志
+                System.out.println("解析 token 失败 => " + e.getMessage());
+                SecurityContextHolder.clearContext();
+                response.setStatus(401);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write(
+                        new ObjectMapper().writeValueAsString(
+                                Map.of("code", 401, "message", e.getMessage())
+                        )
+                );
+                return;
             }
         }
 
         filterChain.doFilter(request, response);
     }
 }
-

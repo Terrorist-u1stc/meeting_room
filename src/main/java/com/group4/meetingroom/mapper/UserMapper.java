@@ -28,6 +28,7 @@ public interface UserMapper {
            select user_id,
                   username,
                   phone,
+                  token_version,
                   role
            from m_room_user
            where user_id = #{id}
@@ -36,7 +37,8 @@ public interface UserMapper {
             @Result(property = "id", column = "user_id"),
             @Result(property = "userName", column = "username"),
             @Result(property = "password", column = "pwd"),
-            @Result(property = "phoneNumber", column = "phone")
+            @Result(property = "phoneNumber", column = "phone"),
+            @Result(property = "tokenVersion", column = "token_version")
     })
     User selectById(int id);
     //通过用户名查询
@@ -46,6 +48,7 @@ public interface UserMapper {
                   phone,
                   pwd,
                   email,
+                  token_version,
                   role
            from m_room_user
            where username = #{userName}
@@ -54,7 +57,8 @@ public interface UserMapper {
             @Result(property = "id", column = "user_id"),
             @Result(property = "userName", column = "username"),
             @Result(property = "password", column = "pwd"),
-            @Result(property = "phoneNumber", column = "phone")
+            @Result(property = "phoneNumber", column = "phone"),
+            @Result(property = "tokenVersion", column = "token_version")
     })
     User selectByName(String userName);
 
@@ -63,9 +67,9 @@ public interface UserMapper {
 
 
     @Update("UPDATE m_room_user " +
-            "SET token_version = (token_version + 1) % 1000000" +
-            "WHERE user_id = #{userId};")
-    int incrementTokenVersion(@Param("userId") int userId);
+            "SET token_version = (token_version + 1) % 1000000 " +
+            "WHERE user_id = #{userId}")
+    int updateTokenVersion(@Param("userId") int userId);
 
 }
 
