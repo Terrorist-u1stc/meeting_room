@@ -16,41 +16,41 @@ import java.sql.SQLException;
 @Service
 public class UserService {
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private UserMapper userMapper;
     //用户登录
-//    public MessageModel<User> userLogin(String userName, String passWord){
-//
-//        MessageModel<User> messageModel1 = new MessageModel<>();
-//        User u = new User();
-//        u.setUserName(userName);
-//        u.setPassword(passWord);
-//        messageModel1.setData(u);
-//
-//        if (StringUtil.isEmpty(userName)||StringUtil.isEmpty(passWord)){
-//            messageModel1.setStatus(0);
-//            messageModel1.setMsg("用户名与密码不能为空!");
-//            return messageModel1;
-//        }
-//        User user = userMapper.selectByName(userName);
-//        if (user == null){
-//            messageModel1.setStatus(0);
-//            messageModel1.setMsg("该用户不存在");
-//            return messageModel1;
-//        }
-//        if (!passWord.equals(user.getPassword())){
-//            messageModel1.setStatus(0);
-//            messageModel1.setMsg("用户密码不正确");
-//            System.out.println("输入密码：" + passWord);
-//            System.out.println("数据库密码：" + user.getPassword());
-//            return  messageModel1;
-//        }
-//        messageModel1.setStatus(HttpStatus.OK.value());
-//        messageModel1.setMsg("登录成功");
-//        messageModel1.setData(user);
-//        return messageModel1;
-//    }
+    public MessageModel<User> userLogin(String userName, String passWord){
+
+        MessageModel<User> messageModel1 = new MessageModel<>();
+        User u = new User();
+        u.setUserName(userName);
+        u.setPassword(passWord);
+        messageModel1.setData(u);
+
+        if (StringUtil.isEmpty(userName)||StringUtil.isEmpty(passWord)){
+            messageModel1.setStatus(0);
+            messageModel1.setMsg("用户名与密码不能为空!");
+            return messageModel1;
+        }
+        User user = userMapper.selectByName(userName);
+        if (user == null){
+            messageModel1.setStatus(0);
+            messageModel1.setMsg("该用户不存在");
+            return messageModel1;
+        }
+        if (!passwordEncoder.matches(passWord, user.getPassword())){
+            messageModel1.setStatus(0);
+            messageModel1.setMsg("用户密码不正确");
+            System.out.println("输入密码：" + passWord);
+            System.out.println("数据库密码：" + user.getPassword());
+            return  messageModel1;
+        }
+        messageModel1.setStatus(HttpStatus.OK.value());
+        messageModel1.setMsg("登录成功");
+        messageModel1.setData(user);
+        return messageModel1;
+    }
     //用户注册
 
     public MessageModel<User> userRegister(User user){

@@ -1,17 +1,15 @@
 package com.group4.meetingroom.controller;
+import com.group4.meetingroom.entity.CustomUserDetails;
 import com.group4.meetingroom.entity.QRCodeUtil;
 import com.group4.meetingroom.entity.RoomReservation;
 import com.group4.meetingroom.entity.User;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.RoomReservationService;
 import jakarta.servlet.http.HttpSession;
-import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
-
 import java.util.List;
 
 
@@ -37,18 +35,24 @@ public class RservationController {
 //        return reservationService.reserveRoom(booking);
 //    }
     public MessageModel<Void> reserveRoom(@RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime,
-                                          @RequestParam int roomID,@RequestParam int attendees, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+                                          @RequestParam int roomID,@RequestParam int attendees) {
+        User user = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getUser();
+
         return reservationService.reserveRoom(startTime, endTime, roomID, attendees, user.getId());
     }
     //查询预约记录
     @CrossOrigin(origins = "*")
     @PostMapping("/getMeetingRoomBookings")
     public MessageModel<List<RoomReservation>> userReserve(
-            @RequestParam(required = false) String date,
-            HttpSession session
+            @RequestParam(required = false) String date
     ){
-        User user = (User) session.getAttribute("user");
+        User user = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getUser();
 //        if (user == null){
 //            MessageModel<List<RoomReservation>> response = new MessageModel<>();
 //            response.setMsg("用户未登录");
@@ -68,7 +72,7 @@ public class RservationController {
     @GetMapping("/generateQRCode")
     public MessageModel<String> generateQRCode(@RequestParam int reservationId) {
         try {
-            String qrContent = "https://test.com/joinMeeting?reservationId=" + reservationId;
+            String qrContent = "http://101.34.82.172:8080/getMeetingDetail?reservationId=" + reservationId;
             String filePath = "D:/qrcodes/" + reservationId + ".png";
             QRCodeUtil.generateQRCodeImage(qrContent, 300, 300, filePath);
             return new MessageModel<>(200, "二维码生成成功", filePath);
@@ -78,3 +82,9 @@ public class RservationController {
         }
     }
 }
+    @CrossOrigin(origins = "*")
+    @GetMapping("/getMeetingDetail")
+    public MessageModel<> getMeetingDetail(@RequestParam int reservationId){
+
+    }
+
