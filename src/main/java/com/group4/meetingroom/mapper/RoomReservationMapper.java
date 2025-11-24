@@ -85,4 +85,29 @@ public interface RoomReservationMapper {
             r_reservation_id = #{rReservationId}
             """)
     int cancel(int rReservationId);
+    @Select("""
+            SELECT r.room_id, start_time, end_time, user_name, attendees, m.room_name
+            from room_reservation r join meeting_room m on r.room_id = m.room_id
+            where r_reservation_id = #{rReservationId}
+            """)
+    @Results({
+            @Result(property = "startTime", column = "start_time"),
+            @Result(property = "endTime", column = "end_time"),
+            @Result(property = "roomId", column = "room_id"),
+            @Result(property = "roomName", column = "room_name")
+    })
+    RoomReservation selectById(Integer rReservationId);
+
+    @Select("SELECT COUNT(*) FROM reservation_participant " +
+            "WHERE r_reservation_id = #{reservationId} AND user_id = #{userId}")
+    int countByReservationAndUser(@Param("reservationId") Integer reservationId,
+                                  @Param("userId") Integer userId);
+
+    @Select("SELECT COUNT(*) FROM room_reservation WHERE r_reservation_id = #{reservationId}")
+    int reservationExists(@Param("reservationId") Integer reservationId);
+
+    @Insert("INSERT INTO reservation_participant(r_reservation_id, user_id) " +
+            "VALUES(#{reservationId}, #{userId})")
+    void insert(@Param("reservationId") Integer reservationId,
+                @Param("userId") Integer userId);
 }

@@ -116,4 +116,49 @@ public class RoomReservationService {
 
         return response;
     }
+    public MessageModel<RoomReservation> getMeetingDetail(Integer reservationId){
+        if (reservationId == null) {
+            return new MessageModel<>(400, "reservationId 不能为空", null);
+        }
+
+        try {
+            RoomReservation reservation = roomReservationMapper.selectById(reservationId);
+            if (reservation == null) {
+                return new MessageModel<>(404, "该会议预约不存在或已取消", null);
+            }
+            return new MessageModel<>(200, "查询成功", reservation);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new MessageModel<>(500, "服务器内部异常", null);
+        }
+    }
+    public MessageModel<Void> joinMeeting(Integer userId, Integer reservationId){
+        MessageModel<Void> result = new MessageModel<>();
+
+        if(userId == null || reservationId == null){
+            result.setStatus(400);
+            result.setMsg("用户ID或预约ID不能为空");
+            return result;
+        }
+
+        int reservationCount = roomReservationMapper.reservationExists(reservationId);
+        if(reservationCount == 0){
+            result.setStatus(404);
+            result.setMsg("该预约不存在");
+            return result;
+        }
+
+        int count = roomReservationMapper.countByReservationAndUser(reservationId, userId);
+        if(count > 0){
+            result.setStatus(409);
+            result.setMsg("用户已参会，无需重复加入");
+            return result;
+        }
+
+        roomReservationMapper.insert(reservationId, userId);
+        result.setStatus(200);
+        result.setMsg("加入会议成功");
+        return result;
+    }
 }

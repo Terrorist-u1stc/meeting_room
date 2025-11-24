@@ -5,7 +5,6 @@ import com.group4.meetingroom.entity.RoomReservation;
 import com.group4.meetingroom.entity.User;
 import com.group4.meetingroom.entity.vo.MessageModel;
 import com.group4.meetingroom.service.RoomReservationService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -72,19 +71,32 @@ public class RservationController {
     @GetMapping("/generateQRCode")
     public MessageModel<String> generateQRCode(@RequestParam int reservationId) {
         try {
-            String qrContent = "http://101.34.82.172:8080/getMeetingDetail?reservationId=" + reservationId;
+            String qrContent = "http://101.34.82.172:8080/getMeetingDetail?reservationId=" + reservationId;//这里要改成前端页面的url
             String filePath = "D:/qrcodes/" + reservationId + ".png";
+            String accessUrl = "http://localhost:8080/qrcodes/" + reservationId +".png";
             QRCodeUtil.generateQRCodeImage(qrContent, 300, 300, filePath);
-            return new MessageModel<>(200, "二维码生成成功", filePath);
+            return new MessageModel<>(200, "二维码生成成功", accessUrl);
         } catch (Exception e) {
             e.printStackTrace();
             return new MessageModel<>(500, "二维码生成失败", null);
         }
     }
-}
+
     @CrossOrigin(origins = "*")
     @GetMapping("/getMeetingDetail")
-    public MessageModel<> getMeetingDetail(@RequestParam int reservationId){
-
+    public MessageModel<RoomReservation> getMeetingDetail(@RequestParam int reservationId){
+        return reservationService.getMeetingDetail(reservationId);
     }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/joinMeeting")
+    public MessageModel<Void> joinMeeting(@RequestParam int reservationId){
+        User user = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getUser();
+        return reservationService.joinMeeting(user.getId(), reservationId);
+    }
+}
+
 
