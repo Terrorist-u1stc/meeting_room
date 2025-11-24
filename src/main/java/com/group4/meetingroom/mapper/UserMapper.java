@@ -58,5 +58,14 @@ public interface UserMapper {
     })
     User selectByName(String userName);
 
+    @Select("SELECT token_version FROM m_room_user WHERE user_id = #{userId}")
+    int getTokenVersionByUserId(@Param("userId") int userId);
+
+
+    @Update("UPDATE m_room_user " +
+            "SET token_version = (token_version + 1) % 1000000" +
+            "WHERE user_id = #{userId};")
+    int incrementTokenVersion(@Param("userId") int userId);
+
 }
 
