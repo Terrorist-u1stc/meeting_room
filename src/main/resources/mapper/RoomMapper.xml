@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.group4.meetingroom.mapper.RoomMapper">
+
+    <update id="updateRoom">
+        UPDATE meeting_room
+        <set>
+            <if test="roomName != null">room_name = #{roomName},</if>
+            <if test="capacity != null">capacity = #{capacity},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="equipment != null">equipment = #{equipment},</if>
+            <if test="location != null">location = #{location},</if>
+        </set>
+        WHERE room_id = #{id}
+    </update>
+
+</mapper>

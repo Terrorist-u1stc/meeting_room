@@ -3,19 +3,19 @@ package com.group4.meetingroom.entity;
 import java.util.List;
 
 public class MeetingRoom {
-    private int id;
+    private Integer id;
     private String roomName;
-    private int capacity;
-    private int status;
+    private Integer capacity;
+    private Integer status;
     private String equipment;
     private String location;
     private List<RoomReservation> reservations;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -27,11 +27,11 @@ public class MeetingRoom {
         this.roomName = roomName;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 
@@ -43,7 +43,7 @@ public class MeetingRoom {
         this.equipment = equipment;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 

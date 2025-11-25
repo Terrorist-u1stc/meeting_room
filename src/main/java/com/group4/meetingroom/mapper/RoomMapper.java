@@ -70,15 +70,15 @@ public interface RoomMapper {
     })
     List<MeetingRoom> selectAll();
     //更新用动态sql语句比较好，但我忘记怎么写了，先将就一下吧
-    @Update("""
-        UPDATE meeting_room
-        SET room_name = #{roomName},
-            capacity = #{capacity},
-            status = #{status},
-            equipment = #{equipment},
-            location = #{location}
-        WHERE room_id = #{id}
-        """)
+//    @Update("""
+//        UPDATE meeting_room
+//        SET room_name = #{roomName},
+//            capacity = #{capacity},
+//            status = #{status},
+//            equipment = #{equipment},
+//            location = #{location}
+//        WHERE room_id = #{id}
+//        """)
     void updateRoom(MeetingRoom room);
 
     @Select("CALL get_room_stats(#{startDate}, #{endDate})")
