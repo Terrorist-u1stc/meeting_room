@@ -94,6 +94,7 @@ public interface RoomReservationMapper {
             @Result(property = "startTime", column = "start_time"),
             @Result(property = "endTime", column = "end_time"),
             @Result(property = "roomId", column = "room_id"),
+            @Result(property = "userName", column = "user_name"),
             @Result(property = "roomName", column = "room_name")
     })
     RoomReservation selectById(Integer rReservationId);

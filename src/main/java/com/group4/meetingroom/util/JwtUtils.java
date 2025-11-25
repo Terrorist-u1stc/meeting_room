@@ -13,7 +13,6 @@ public class JwtUtils {
     private static final String SECRET = "xK94mki2Nsa8eLz!@#QpRsTuVwXyZ123456";
     private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    // 生成带版本号的 token
     public static String generateToken(Integer userId, Integer tokenVersion) {
         return Jwts.builder()
                 .subject(userId.toString())
@@ -24,7 +23,6 @@ public class JwtUtils {
                 .compact();
     }
 
-    // 统一解析方法，失败直接抛异常
     public static Claims parseClaims(String token) {
         try {
             return Jwts.parser()
@@ -39,7 +37,6 @@ public class JwtUtils {
         }
     }
 
-    // 保留老方法，兼容之前代码（可选）
     public static Integer parseToken(String token) {
         try {
             Claims claims = parseClaims(token);

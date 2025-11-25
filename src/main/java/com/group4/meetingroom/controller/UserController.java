@@ -61,7 +61,6 @@ public MessageModel<Map<String, Object>> userLogin(
     @ResponseBody
     public MessageModel<Void> logout(){
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Logout Authentication = " + auth);
         if (auth == null) {
             MessageModel<Void> r= new MessageModel<>();
             r.setStatus(402);

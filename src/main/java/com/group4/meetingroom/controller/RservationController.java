@@ -14,6 +14,8 @@ import java.util.List;
 
 @RestController
 public class RservationController {
+    private static final String QR_CODE_DIR = "/home/ubuntu/qrcodes/";
+
     @Autowired
     private RoomReservationService reservationService;
     //预约会议室
@@ -72,8 +74,8 @@ public class RservationController {
     public MessageModel<String> generateQRCode(@RequestParam int reservationId) {
         try {
             String qrContent = "http://101.34.82.172:8080/getMeetingDetail?reservationId=" + reservationId;//这里要改成前端页面的url
-            String filePath = "D:/qrcodes/" + reservationId + ".png";
-            String accessUrl = "http://localhost:8080/qrcodes/" + reservationId +".png";
+            String filePath = QR_CODE_DIR + reservationId + ".png";
+            String accessUrl = "http://101.34.82.172:8080/qrcodes/" + reservationId +".png";
             QRCodeUtil.generateQRCodeImage(qrContent, 300, 300, filePath);
             return new MessageModel<>(200, "二维码生成成功", accessUrl);
         } catch (Exception e) {

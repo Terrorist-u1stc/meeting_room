@@ -31,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("---- JWT Filter executed ----");
 
 
         String header = request.getHeader("Authorization");
@@ -45,15 +44,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 Integer userId = Integer.valueOf(claims.getSubject());
                 Integer tokenVersion = claims.get("tokenVersion", Integer.class);
 
-                System.out.println("Token verify success, userId = " + userId + ", tokenVersion = " + tokenVersion);
 
 
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     System.out.println("Authentication was NULL, setting a new authentication.");
 
                     CustomUserDetails userDetails = (CustomUserDetails) userDetailService.loadUserById(userId);
-
-                    // 核心：版本号校验
                     if (!userDetails.getTokenVersion().equals(tokenVersion)) {
                         throw new RuntimeException("登录已失效，请重新登录");
                     }
@@ -62,7 +58,6 @@ public class JwtFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    System.out.println("Authentication SET SUCCESSFULLY.");
                 }
             } catch (Exception e) {
                 System.out.println("解析 token 失败 => " + e.getMessage());
